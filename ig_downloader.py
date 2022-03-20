@@ -13,6 +13,8 @@ headers = {'User-Agent': user_agent}
 
 username = 'saitaro.bot'
 password = 'othman8462'
+Client._extract_rhx_gis = lambda self, * \
+    args, **kwargs: "4f8732eb9ba7d1c8e8897a75d6474d4eb3f5279137431b2aafb71fafe2abe178"
 
 
 def from_json(json_object):
@@ -65,9 +67,10 @@ def get_user_story(username):
 
     user = get_user(username)
     if user['is_private']:
-        print('user is private')
-        return
+        return [0, 'user is private']
+
     stories = stories_api.reels_feed(reel_ids=[user["id"]])
+    story_files = []
     for story in stories['data']['reels_media'][0]['items']:
         if story['is_video']:
             # video
@@ -76,6 +79,7 @@ def get_user_story(username):
             req = requests.get(video_url)
             with open(f'{story["id"]}.mp4', 'wb') as f:
                 f.write(req.content)
+            story_files.append(f'{story["id"]}.mp4')
 
         else:
             # image
@@ -84,6 +88,8 @@ def get_user_story(username):
             r = requests.get(media_url, headers=headers)
             with open(f'{story["id"]}.jpg', 'wb') as f:
                 f.write(r.content)
+            story_files.append(f'{story["id"]}.jpg')
+    return [1, story_files]
 
 
 def get_post_media(url):
@@ -91,12 +97,12 @@ def get_post_media(url):
     try:
         post = posts_api.media_info2(code)
     except ClientError:
-        print('error, please check the url you entered and make sure that the account is public')
-        return
+        return [0, 'error, please check the url you entered and make sure that the account is public']
+
         # save post to json file
     with open('post.json', 'w') as f:
         json.dump(post, f)
-
+    file_name = ''
     if post['is_video']:
         # video
         print('video')
@@ -104,6 +110,7 @@ def get_post_media(url):
         req = requests.get(video_url)
         with open(f'{post["id"]}.mp4', 'wb') as f:
             f.write(req.content)
+        file_name = f'{post["id"]}.mp4'
     else:
         # image
         print('image')
@@ -111,3 +118,8 @@ def get_post_media(url):
         r = requests.get(media_url, headers=headers)
         with open(f'{post["id"]}.jpg', 'wb') as f:
             f.write(r.content)
+        file_name = f'{post["id"]}.jpg'
+    return [1, file_name]
+
+
+get_user_story('pain.memess')
