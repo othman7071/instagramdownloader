@@ -120,6 +120,3 @@ def get_post_media(url):
             f.write(r.content)
         file_name = f'{post["id"]}.jpg'
     return [1, file_name]
-
-
-get_user_story('pain.memess')
