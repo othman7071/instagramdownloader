@@ -30,7 +30,7 @@ def story(message):
 
 @bot.message_handler(func=lambda message: 'post' in message.text.lower())
 def post(message):
-    url = message.split(' ')[1]
+    url = message.text.split(' ')[1]
     post_media = get_post_media(url)
     if post_media[0] == 0:
         bot.send_message(message.chat.id, post_media[1])
