@@ -36,10 +36,10 @@ def post(message):
         bot.send_message(message.chat.id, post_media[1])
     else:
         if post_media[1].endswith('.mp4'):
-            bot.send_video(message.chat.id, open(post_media, 'rb'))
+            bot.send_video(message.chat.id, open(post_media[1], 'rb'))
         else:
-            bot.send_photo(message.chat.id, open(post_media, 'rb'))
-        os.remove(post_media)
+            bot.send_photo(message.chat.id, open(post_media[1], 'rb'))
+        os.remove(post_media[1])
 
 
 bot.infinity_polling()

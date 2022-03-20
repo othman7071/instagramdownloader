@@ -114,7 +114,7 @@ def get_post_media(url):
     else:
         # image
         print('image')
-        media_url = post['images']['standard_resolution']['url']
+        media_url = post["display_url"]
         r = requests.get(media_url, headers=headers)
         with open(f'{post["id"]}.jpg', 'wb') as f:
             f.write(r.content)
