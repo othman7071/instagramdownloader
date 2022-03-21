@@ -38,8 +38,9 @@ except:
     get_cookies(settings_path='settings.json',
                 username=username, password=password)
     stories_api = login('settings.json')
-
+print('login success')
 posts_api = Client(user_agent=user_agent)
+print('login success')
 
 
 def get_post_code(post_url):
