@@ -20,26 +20,28 @@ def story(message):
     if story_files[0] == 0:
         bot.send_message(message.chat.id, story_files[1])
     else:
-        for story_file in story_files[1]:
-            if story_file.endswith('.mp4'):
-                bot.send_video(message.chat.id, open(story_file, 'rb'))
-            else:
-                bot.send_photo(message.chat.id, open(story_file, 'rb'))
-            os.remove(story_file)
+        for story_url in story_files[1]:
+            # if story_file.endswith('.mp4'):
+            #     bot.send_video(message.chat.id, open(story_file, 'rb'))
+            # else:
+            #     bot.send_photo(message.chat.id, open(story_file, 'rb'))
+            # os.remove(story_file)
+            bot.send_message(message.chat.id, story_url)
 
 
 @bot.message_handler(func=lambda message: 'post' in message.text.lower())
 def post(message):
-    url = message.text.split(' ')[1]
+    url = message.text.split('  ')[1]
     post_media = get_post_media(url)
     if post_media[0] == 0:
         bot.send_message(message.chat.id, post_media[1])
     else:
-        if post_media[1].endswith('.mp4'):
-            bot.send_video(message.chat.id, open(post_media[1], 'rb'))
-        else:
-            bot.send_photo(message.chat.id, open(post_media[1], 'rb'))
-        os.remove(post_media[1])
+        # if post_media[1].endswith('.mp4'):
+        #     bot.send_video(message.chat.id, open(post_media[1], 'rb'))
+        # else:
+        #     bot.send_photo(message.chat.id, open(post_media[1], 'rb'))
+        # os.remove(post_media[1])
+        bot.send_message(message.chat.id, post_media[1])
 
 
 bot.infinity_polling()

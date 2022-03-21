@@ -77,18 +77,18 @@ def get_user_story(username):
             print('video')
             video_url = story["video_resources"][0]['src']
             req = requests.get(video_url)
-            with open(f'{story["id"]}.mp4', 'wb') as f:
-                f.write(req.content)
-            story_files.append(f'{story["id"]}.mp4')
+            # with open(f'{story["id"]}.mp4', 'wb') as f:
+            #     f.write(req.content)
+            story_files.append(video_url)
 
         else:
             # image
             print('image')
             media_url = story["display_url"]
-            r = requests.get(media_url, headers=headers)
-            with open(f'{story["id"]}.jpg', 'wb') as f:
-                f.write(r.content)
-            story_files.append(f'{story["id"]}.jpg')
+            # r = requests.get(media_url, headers=headers)
+            # with open(f'{story["id"]}.jpg', 'wb') as f:
+            #     f.write(r.content)
+            story_files.append(media_url)
     return [1, story_files]
 
 
@@ -100,23 +100,23 @@ def get_post_media(url):
         return [0, 'error, please check the url you entered and make sure that the account is public']
 
         # save post to json file
-    with open('post.json', 'w') as f:
-        json.dump(post, f)
+    # with open('post.json', 'w') as f:
+    #     json.dump(post, f)
     file_name = ''
     if post['is_video']:
         # video
         print('video')
         video_url = post['video_url']
-        req = requests.get(video_url)
-        with open(f'{post["id"]}.mp4', 'wb') as f:
-            f.write(req.content)
-        file_name = f'{post["id"]}.mp4'
+        # req = requests.get(video_url)
+        # with open(f'{post["id"]}.mp4', 'wb') as f:
+        #     f.write(req.content)
+        file_name = video_url
     else:
         # image
         print('image')
         media_url = post["display_url"]
-        r = requests.get(media_url, headers=headers)
-        with open(f'{post["id"]}.jpg', 'wb') as f:
-            f.write(r.content)
-        file_name = f'{post["id"]}.jpg'
+        # r = requests.get(media_url, headers=headers)
+        # with open(f'{post["id"]}.jpg', 'wb') as f:
+        #     f.write(r.content)
+        file_name = media_url
     return [1, file_name]
