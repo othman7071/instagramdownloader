@@ -25,7 +25,7 @@ def onlogin_callback(api, new_settings_file):
         print('SAVED: {0!s}'.format(new_settings_file))
 
 
-def get_cookies(settings_path, username, password):
+def get_cookies(save_path, username, password):
     api = Client(
         username, password,
-        on_login=lambda x: onlogin_callback(x, settings_path))
+        on_login=lambda x: onlogin_callback(x, save_path))

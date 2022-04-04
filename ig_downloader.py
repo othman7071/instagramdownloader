@@ -3,45 +3,39 @@ import requests
 from instagram_web_api import Client, ClientError
 import json
 import codecs
-from login_cookies import get_cookies
-# get user story
+from login_cookies import get_cookies,from_json
+
+# in this app i use web api instead of private api because web api takes longer to get blocked (for me)
 
 
-# save cookies to file
+
 user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'
 headers = {'User-Agent': user_agent}
-
 username = 'saitaro.bot'
 password = 'othman8462'
+
 
 # i did this to replace the original function since the original one is not working
 Client._extract_rhx_gis = staticmethod(lambda *args: "4f8732eb9ba7d1c8e8897a75d6474d4eb3f5279137431b2aafb71fafe2abe178")
 
 
-def from_json(json_object):
-    if '__class__' in json_object and json_object['__class__'] == 'bytes':
-        return codecs.decode(json_object['__value__'].encode(), 'base64')
-    return json_object
-
-
 def login(cookies_folder):
     settings_json = open(cookies_folder)
     cached_settings = json.load(settings_json, object_hook=from_json)
-    stories_api = Client(
+    api = Client(
         auto_patch=True, settings=cached_settings, user_agent=user_agent, username=username, password=password, authenticate=True)
-    return stories_api
+    return api
 
 
 try:
-    stories_api = login('settings.json')
-
+    api = login('settings.json')
 except:
-    get_cookies(settings_path='settings.json',
+    get_cookies(save_path='settings.json',
                 username=username, password=password)
-    stories_api = login('settings.json')
-print('login success')
-posts_api = Client(user_agent=user_agent)
-print('login success')
+    api = login('settings.json')
+
+
+
 
 
 def get_post_code(post_url):
@@ -60,8 +54,12 @@ def get_user(username):
     url = f'https://www.instagram.com/{username}/?__a=1'
     r = requests.get(url)
     data = r.json()
-    id = data['graphql']['user']['id']
-    is_private = data['graphql']['user']['is_private']
+    try:
+        id = data['graphql']['user']['id']
+        is_private = data['graphql']['user']['is_private']
+    except:
+        raise Exception('please check the username you entered and make sure that the account is public')
+    
     return {"id": id, "is_private": is_private}
 
 
@@ -69,58 +67,60 @@ def get_user_story(username):
 
     user = get_user(username)
     if user['is_private']:
-        return [0, 'user is private']
-
-    stories = stories_api.reels_feed(reel_ids=[user["id"]])
-    story_files = []
-    for story in stories['data']['reels_media'][0]['items']:
+        raise Exception('This account is private or does not exist')
+    
+    stories = api.reels_feed(reel_ids=[user["id"]])['data']['reels_media']
+    
+    if len(stories) == 0:
+        raise Exception('This account has no stories')
+     
+       
+    for story in stories[0]['items']:
         if story['is_video']:
             # video
             print('video')
             video_url = story["video_resources"][0]['src']
-            # with open(f'{story["id"]}.mp4', 'wb') as f:
-            #     f.write(req.content)
-            story_files.append(video_url)
+            yield video_url
 
         else:
             # image
             print('image')
-            media_url = story["display_url"]
-            # r = requests.get(media_url, headers=headers)
-            # with open(f'{story["id"]}.jpg', 'wb') as f:
-            #     f.write(r.content)
-            story_files.append(media_url)
-    return [1, story_files]
+            image_url = story["display_url"]
+            yield image_url
 
 
-def get_post_media(url):
-    code = get_post_code(url)
-    try:
-        post = posts_api.media_info2(code)
-    except ClientError:
-        return [0, 'error, please check the url you entered and make sure that the account is public']
+def get_post(url):
+    if '?__a=1' not in url:
+        url+= '?__a=1'
+    user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+    r = requests.get(url, headers={'User-Agent': user_agent})
+    data = r.json()['graphql']['shortcode_media']
+    with open('data.json', 'w') as f:
+        json.dump(data, f)
+    if 'edge_sidecar_to_children' not in data:
+        if data['is_video']:
+            # video
+            print('video')
+            video_url = data['video_url']
+            yield video_url
+        else:    
+            # image
+            print('image')
+            yield data['display_url']
+        return
+        
+    for post in data['edge_sidecar_to_children']['edges']:
+        media = post['node']
+        if media['is_video']:
+            # video
+            print('video')
+            video_url = media['video_url']
+            yield video_url
+        
+        else:
+            # image
+            print('image')
+            image_url = media['display_url']
+            yield image_url
 
-        # save post to json file
-    # with open('post.json', 'w') as f:
-    #     json.dump(post, f)
-    file_name = ''
-    if post['is_video']:
-        # video
-        print('video')
-        video_url = post['video_url']
-        # req = requests.get(video_url)
-        # with open(f'{post["id"]}.mp4', 'wb') as f:
-        #     f.write(req.content)
-        file_name = video_url
-    else:
-        # image
-        print('image')
-        media_url = post["display_url"]
-        # r = requests.get(media_url, headers=headers)
-        # with open(f'{post["id"]}.jpg', 'wb') as f:
-        #     f.write(r.content)
-        file_name = media_url
-    return [1, file_name]
 
-
-get_user_story('pain.memess')
