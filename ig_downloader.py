@@ -1,13 +1,13 @@
-import codecs
 import requests
-from instagram_web_api import Client, ClientError
+from instagram_web_api import Client
 import json
-import codecs
 from login_cookies import get_cookies,from_json
 
+# i did this to replace the original function since the original one is not working
+Client._extract_rhx_gis = staticmethod(lambda *args: "4f8732eb9ba7d1c8e8897a75d6474d4eb3f5279137431b2aafb71fafe2abe178")
+
+
 # in this app i use web api instead of private api because web api takes longer to get blocked (for me)
-
-
 
 user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'
 headers = {'User-Agent': user_agent}
@@ -15,8 +15,6 @@ username = 'saitaro.bot'
 password = 'othman8462'
 
 
-# i did this to replace the original function since the original one is not working
-Client._extract_rhx_gis = staticmethod(lambda *args: "4f8732eb9ba7d1c8e8897a75d6474d4eb3f5279137431b2aafb71fafe2abe178")
 
 
 def login(cookies_folder):
@@ -33,21 +31,6 @@ except:
     get_cookies(save_path='settings.json',
                 username=username, password=password)
     api = login('settings.json')
-
-
-
-
-
-def get_post_code(post_url):
-    code = post_url.split('/')[-2]
-    return code
-
-
-def get_media_id(url):
-    req = requests.get('https://api.instagram.com/oembed/?url=' + url)
-    data = req.json()
-    media_id = data['media_id']
-    return media_id
 
 
 def get_user(username):
@@ -90,13 +73,14 @@ def get_user_story(username):
 
 
 def get_post(url):
-    if '?__a=1' not in url:
-        url+= '?__a=1'
+    # remove everything after the last '/' then add '/?__a=1' so you can use the api
+    url = url[0 : url.rfind('/')+1] + '?__a=1'
+    
+
     user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
     r = requests.get(url, headers={'User-Agent': user_agent})
     data = r.json()['graphql']['shortcode_media']
-    with open('data.json', 'w') as f:
-        json.dump(data, f)
+    
     if 'edge_sidecar_to_children' not in data:
         if data['is_video']:
             # video
@@ -122,5 +106,3 @@ def get_post(url):
             print('image')
             image_url = media['display_url']
             yield image_url
-
-
