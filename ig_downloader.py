@@ -13,8 +13,9 @@ headers = {'User-Agent': user_agent}
 
 username = 'saitaro.bot'
 password = 'othman8462'
-Client._extract_rhx_gis = lambda self, * \
-    args, **kwargs: "4f8732eb9ba7d1c8e8897a75d6474d4eb3f5279137431b2aafb71fafe2abe178"
+
+# i did this to replace the original function since the original one is not working
+Client._extract_rhx_gis = staticmethod(lambda *args: "4f8732eb9ba7d1c8e8897a75d6474d4eb3f5279137431b2aafb71fafe2abe178")
 
 
 def from_json(json_object):
@@ -77,7 +78,6 @@ def get_user_story(username):
             # video
             print('video')
             video_url = story["video_resources"][0]['src']
-            req = requests.get(video_url)
             # with open(f'{story["id"]}.mp4', 'wb') as f:
             #     f.write(req.content)
             story_files.append(video_url)
