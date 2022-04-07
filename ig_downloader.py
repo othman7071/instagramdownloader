@@ -33,7 +33,7 @@ except:
     api = login('settings.json')
 
 
-def get_user(username):
+def get_user(username: str) -> dict:
     url = f'https://www.instagram.com/{username}/?__a=1'
     r = requests.get(url)
     data = r.json()
@@ -41,21 +41,27 @@ def get_user(username):
         id = data['graphql']['user']['id']
         is_private = data['graphql']['user']['is_private']
     except:
-        raise Exception('please check the username you entered and make sure that the account is public')
-    
+        return 'please check the username you entered and make sure that the account is public'
+    print(id)
     return {"id": id, "is_private": is_private}
 
 
 def get_user_story(username):
 
     user = get_user(username)
+    if type(user) == str:
+        yield user
+        raise
+
     if user['is_private']:
-        raise Exception('This account is private or does not exist')
+        yield 'This account is private or does not exist'
+        return
     
     stories = api.reels_feed(reel_ids=[user["id"]])['data']['reels_media']
     
     if len(stories) == 0:
-        raise Exception('This account has no stories')
+        yield 'This account has no stories'
+        return
      
        
     for story in stories[0]['items']:
@@ -106,3 +112,6 @@ def get_post(url):
             print('image')
             image_url = media['display_url']
             yield image_url
+if __name__=='__main__':
+        for p in get_user_story('pain.memess'):
+                print(p)
