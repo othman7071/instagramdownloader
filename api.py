@@ -13,14 +13,11 @@ class InstaLink:
         self.cl = cl
         print('Logged in')
 
-        
+    
     def get_user_stories(self,username:str)->str:
         
-        user = get_user(username)
-        if user['is_private']:
-            yield 'This account is private or does not exist'
-            return
-        stories = self.cl.user_stories(user['id'])
+        user = self.cl.user_id_from_username(username)
+        stories = self.cl.user_stories(user)
         if len(stories) == 0:
             yield 'This account has no stories'
             return
