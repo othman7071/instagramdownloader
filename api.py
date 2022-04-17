@@ -1,6 +1,6 @@
 from instagrapi import  Client  
 from ig_downloader import get_user 
-
+import json
 
 class InstaLink:
     def __init__(self,username,password,settings_path):
@@ -26,8 +26,20 @@ class InstaLink:
                 yield story.thumbnail_url
             else:
                 yield story.video_url
+    
+    # def get_post(self,url):
+    #     pk = self.cl.media_pk_from_url(url)
+    #     media_info = self.cl.media_info(pk).dict()
+    #     if 'resources' in media_info:
+            
+    #     if media_info['media_type'] == 1:
+    #         return media_info['thumbnail_url']
+    #     else:
+    #         return media_info['video_url']
+            
+downloader = InstaLink('saitaro.bot','othman8462','settings.json')
+print(downloader.get_post('https://www.instagram.com/tv/Cb7vCONKXVk/?utm_medium=copy_link'))
 
-        
 
 
 
