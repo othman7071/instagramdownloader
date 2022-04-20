@@ -1,6 +1,5 @@
 from instagrapi import  Client  
-from ig_downloader import get_user 
-import json
+
 
 
 
@@ -20,6 +19,7 @@ class InstaLink:
         
         user = self.cl.user_id_from_username(username)
         stories = self.cl.user_stories(user)
+        
         if len(stories) == 0:
             yield 'This account has no stories'
             return
@@ -29,19 +29,39 @@ class InstaLink:
             else:
                 yield story.video_url
     
-    # def get_post(self,url):
-    #     pk = self.cl.media_pk_from_url(url)
-    #     media_info = self.cl.media_info(pk).dict()
-    #     if 'resources' in media_info:
-            
-    #     if media_info['media_type'] == 1:
-    #         return media_info['thumbnail_url']
-    #     else:
-    #         return media_info['video_url']
-            
-# downloader = InstaLink('saitaro.bot','othman8462','settings.json')
-# print(downloader.get_post('https://www.instagram.com/tv/Cb7vCONKXVk/?utm_medium=copy_link'))
+    def get_post(self,url):
+        instagram_url = 'https://www.instagram.com'
+        if not ( url.startswith(instagram_url + '/p') or url.startswith(instagram_url + '/tv') ):
+            yield 'Invalid url'
+            return
+        
+        pk = self.cl.media_pk_from_url(url)
+        media_info = self.cl.media_info(pk).dict()
+        
 
+        if media_info['media_type'] == 2 and media_info['product_type'] == 'igtv':
+            yield media_info['video_url']
+            return 
+
+        if media_info['media_type'] == 1:
+            yield media_info['thumbnail_url']
+            return
+        
+        elif media_info['media_type'] == 8:
+            for m in media_info['resources']:
+                if m['media_type'] == 1:
+                    yield m['thumbnail_url']
+                else:
+                    yield m['video_url']
+            return 
+
+        else:
+            yield media_info['video_url']
+            return
+if __name__ =='__main__':    
+    downloader = InstaLink('saitaro.bot','othman8462','settings.json')
+    for url in downloader.get_post('https://www.instagram.com/tv/CM00475Df-l/'):
+        print(url)
 
 
 
