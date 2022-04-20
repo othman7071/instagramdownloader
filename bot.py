@@ -3,7 +3,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters
 from api import InstaLink
 
 
-token = '5176003719:AAE0aUx0m6RriMUl3yOM4vMrjDeTbV8NWPI'
+token = '5190894970:AAES0EweIzvAg3NI4pxXuVVb7MpN3lXbE68'
 downloader = InstaLink('saitaro.bot','othman8462','settings.json')
 updater = Updater(token,use_context=True)
 dispacher = updater.dispatcher

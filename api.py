@@ -31,7 +31,7 @@ class InstaLink:
     
     def get_post(self,url):
         instagram_url = 'https://www.instagram.com'
-        if not ( url.startswith(instagram_url + '/p') or url.startswith(instagram_url + '/tv') ):
+        if not ( url.startswith(instagram_url + '/p') or url.startswith(instagram_url + '/tv') or url.startswith(instagram_url + '/reel' )):
             yield 'Invalid url'
             return
         
@@ -54,13 +54,14 @@ class InstaLink:
                 else:
                     yield m['video_url']
             return 
-
+        elif media_info['media_type'] == 2 and media_info['product_type'] == 'clips':
+            yield media_info['video_url']
         else:
             yield media_info['video_url']
             return
 if __name__ =='__main__':    
     downloader = InstaLink('saitaro.bot','othman8462','settings.json')
-    for url in downloader.get_post('https://www.instagram.com/tv/CM00475Df-l/'):
+    for url in downloader.get_post('https://www.instagram.com/reel/Cb-mKq_hIbl/?igshid=YmMyMTA2M2Y='):
         print(url)
 
 
