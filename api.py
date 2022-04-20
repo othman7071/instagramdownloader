@@ -2,6 +2,8 @@ from instagrapi import  Client
 from ig_downloader import get_user 
 import json
 
+
+
 class InstaLink:
     def __init__(self,username,password,settings_path):
         self.username = username
@@ -37,8 +39,8 @@ class InstaLink:
     #     else:
     #         return media_info['video_url']
             
-downloader = InstaLink('saitaro.bot','othman8462','settings.json')
-print(downloader.get_post('https://www.instagram.com/tv/Cb7vCONKXVk/?utm_medium=copy_link'))
+# downloader = InstaLink('saitaro.bot','othman8462','settings.json')
+# print(downloader.get_post('https://www.instagram.com/tv/Cb7vCONKXVk/?utm_medium=copy_link'))
 
 
 
